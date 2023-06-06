@@ -1,0 +1,44 @@
+/* Write your global styles here, in SCSS syntax. */
+/* Import only what you need from Bulma */
+
+// Variables
+@import 'variables';
+
+// Fonts
+@import '@mdi/font/scss/materialdesignicons';
+
+// Import Bulma styles
+@import 'bulma/sass/utilities/_all';
+@import 'bulma/sass/base/_all';
+@import 'bulma/sass/elements/_all';
+@import 'bulma/sass/form/_all';
+@import 'bulma/sass/components/_all';
+@import 'bulma/sass/grid/_all';
+@import 'bulma/sass/helpers/_all';
+@import 'bulma/sass/layout/_all';
+
+html,
+body {
+    min-height: 100%;
+}
+
+#app {
+    min-height: 100vh;
+}
+
+.is-fullheight {
+    height: 100%;
+}
+
+//* {
+//  outline: lightgrey dashed 1px;
+//}
+//.container {
+//  outline: lightgreen dashed 4px;
+//}
+//.columns {
+//  outline: lightskyblue dashed 3px;
+//}
+//.column {
+//  outline: lightblue dashed 2px;
+//}
