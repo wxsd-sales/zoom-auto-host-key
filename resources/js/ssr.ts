@@ -1,4 +1,4 @@
-import { createSSRApp, h, DefineComponent } from 'vue';
+import { createSSRApp, h, type DefineComponent } from 'vue';
 import { renderToString } from '@vue/server-renderer';
 import { createInertiaApp } from '@inertiajs/vue3';
 import createServer from '@inertiajs/vue3/server';
@@ -7,21 +7,25 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 
 const appName = 'Laravel';
 
-createServer((page) =>
-    createInertiaApp({
-        page,
-        render: renderToString,
-        title: (title) => `${title} - ${appName}`,
-        resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob<DefineComponent>('./Pages/**/*.vue')),
-        setup({ App, props, plugin }) {
-            return createSSRApp({ render: () => h(App, props) })
-                .use(plugin)
-                .use(ZiggyVue, {
-                    // @ts-expect-error
-                    ...page.props.ziggy,
-                    // @ts-expect-error
-                    location: new URL(page.props.ziggy.location),
-                });
-        },
+createServer(
+  async (page) =>
+    await createInertiaApp({
+      page,
+      render: renderToString,
+      title: (title) => `${title} - ${appName}`,
+      resolve: async (name) =>
+        await resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob<DefineComponent>('./Pages/**/*.vue')),
+      setup({ App, props, plugin }) {
+        return createSSRApp({ render: () => h(App, props) })
+          .use(plugin)
+          .use(ZiggyVue, {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            ...page.props.ziggy,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            location: new URL(page.props.ziggy.location)
+          });
+      }
     })
 );
