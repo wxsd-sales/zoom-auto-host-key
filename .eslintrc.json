@@ -19,5 +19,13 @@
   },
   "plugins": ["@typescript-eslint", "vue"],
   "rules": {},
+  "overrides": [
+    {
+      "files": ["resources/js/Pages/**"],
+      "rules": {
+        "vue/multi-word-component-names": "off"
+      }
+    }
+  ],
   "root": true
 }
