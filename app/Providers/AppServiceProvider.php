@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Rules\Has;
+use App\Rules\HydraId;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -100,5 +103,11 @@ class AppServiceProvider extends ServiceProvider
         Collection::macro('kebabCaseKeys', fn ($depth = PHP_INT_MAX): Collection => $this->recursive(
             $depth, [], fn ($key) => gettype($key) === 'integer' ? $key : Str::kebab($key))
         );
+
+        Rule::macro('has', fn (
+            string|array $required, ?string $valueSeparator = ' ', ?callable $valueComparer = null
+        ): Has => new Has($required, $valueSeparator, $valueComparer));
+
+        Rule::macro('hydraId', fn (string $match, bool $strict = false): HydraId => new HydraId($match, $strict));
     }
 }
