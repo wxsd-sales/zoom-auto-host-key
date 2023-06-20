@@ -2,10 +2,12 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Account;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
@@ -14,8 +16,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      * Validate and update the given user's profile information.
      *
      * @param  array<string, string>  $input
+     *
+     * @throws ValidationException
+     * @throws \Throwable
      */
-    public function update(User $user, array $input): void
+    public function update(User $user, array $input, Account $account = null): void
     {
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
@@ -27,13 +32,15 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $user->updateProfilePhoto($input['photo']);
         }
 
-        if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
+        $account?->user()->associate($user)->save();
+
+        if ($input['email'] !== $user->email && $user instanceof MustVerifyEmail) {
             $this->updateVerifiedUser($user, $input);
         } else {
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
+                'email_verified_at' => $account ? $input['email_verified_at'] : null,
             ])->save();
         }
     }
@@ -45,11 +52,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     protected function updateVerifiedUser(User $user, array $input): void
     {
-        $user->forceFill([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'email_verified_at' => null,
-        ])->save();
+        $user->forceFill(['name' => $input['name'], 'email' => $input['email'], 'email_verified_at' => null])->save();
 
         $user->sendEmailVerificationNotification();
     }
