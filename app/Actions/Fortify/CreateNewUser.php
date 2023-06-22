@@ -20,6 +20,7 @@ class CreateNewUser implements CreatesNewUsers
      * @param  array<string, string>  $input
      *
      * @throws ValidationException
+     * @throws \Throwable
      */
     public function create(array $input, Account $account = null): User
     {
