@@ -1,0 +1,69 @@
+/* Write your global styles here, in SCSS syntax. */
+/* Import only what you need from Bulma */
+
+// Variables
+@import 'variables';
+
+// Fonts
+@import '@mdi/font/scss/materialdesignicons';
+
+// Import Bulma styles
+@import 'bulma/sass/utilities/_all';
+@import 'bulma/sass/base/_all';
+@import 'bulma/sass/elements/_all';
+@import 'bulma/sass/form/_all';
+@import 'bulma/sass/components/_all';
+@import 'bulma/sass/grid/_all';
+@import 'bulma/sass/helpers/_all';
+@import 'bulma/sass/layout/_all';
+
+:root {
+  --brand-title-size: calc(#{$title-size} * 2 + 0.35);
+  --brand-subtitle-size: calc(#{$title-size} * 0.5 + 0.35);
+  --border-radius: #{$radius};
+  --border-radius-large: #{$radius-large};
+  --border-radius-small: #{$radius-small};
+  --size-1: #{$size-1};
+  --size-2: #{$size-2};
+  --size-3: #{$size-3};
+  --size-4: #{$size-4};
+  --size-5: #{$size-5};
+  --size-6: #{$size-6};
+  --size-7: #{$size-7};
+}
+
+[x-cloak] {
+  display: none;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+html {
+  scroll-padding-top: $navbar-height + 1.2rem;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.is-fullheight {
+  height: 100%;
+}
+
+pre {
+  max-height: 400px;
+  border-radius: var(--border-radius);
+}
+
+details {
+  border: 1px solid hsl(0deg, 0%, 86%);
+  border-radius: var(--border-radius);
+  padding: 0.75rem;
+}
+
+details > summary {
+  cursor: pointer;
+}
