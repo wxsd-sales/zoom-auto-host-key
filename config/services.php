@@ -31,4 +31,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'webex' => [
+        'client_id' => env('WEBEX_CLIENT_ID'),
+        'client_secret' => env('WEBEX_CLIENT_SECRET'),
+        'redirect' => env('WEBEX_REDIRECT_URI', '/auth/webex/callback'),
+        'scopes' => explode(' ', env('WEBEX_SCOPES', 'spark:people_read spark:kms')),
+        'require_role' => env('WEBEX_REQUIRE_ROLE', 'Y2lzY29zcGFyazovL3VzL1JPTEUvaWRfZnVsbF9hZG1pbg'),
+        'oauth_url' => env('WEBEX_OAUTH_URL', 'https://webexapis.com/v1/access_token'),
+    ],
 ];
