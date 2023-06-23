@@ -8,6 +8,7 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 const appName = window.document.getElementsByTagName('title')[0]?.innerText ?? 'Laravel';
 
 void createInertiaApp({
+  id: 'main',
   title: (title) => `${title} - ${appName}`,
   resolve: async (name) =>
     await resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob<DefineComponent>('./Pages/**/*.vue')),

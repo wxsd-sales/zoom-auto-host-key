@@ -12,6 +12,7 @@ createServer(
     await createInertiaApp({
       page,
       render: renderToString,
+      id: 'main',
       title: (title) => `${title} - ${appName}`,
       resolve: async (name) =>
         await resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob<DefineComponent>('./Pages/**/*.vue')),
