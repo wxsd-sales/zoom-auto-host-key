@@ -153,4 +153,32 @@ return [
         ],
     ],
 
+    'zoom' => [
+        'oauth_url' => env('ZOOM_OAUTH_URL', 'https://zoom.us/oauth/token'),
+        'server_to_server' => [
+            'scopes' => [
+                [
+                    'id' => 'meeting:read:admin',
+                    'name' => 'View all user meetings',
+                    'description' => 'Retrieve the host for an on device Zoom Meeting',
+                ],
+                [
+                    'id' => 'meeting:read:admin',
+                    'name' => 'View and manage all user meetings',
+                    'description' => 'Add machine/room account as host for an on device Zoom Meeting',
+                ],
+                [
+                    'id' => 'user:read:admin',
+                    'name' => 'View all user information',
+                    'description' => 'Lookup and Ensure user belongs to the organization',
+                ],
+                [
+                    'id' => 'user:write:admin',
+                    'name' => 'View users information and manage users',
+                    'description' => "Update an account's (user or machine/room) host key",
+                ],
+            ],
+        ],
+    ],
+
 ];
