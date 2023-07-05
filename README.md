@@ -1,66 +1,144 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Zoom Auto Host Key
+==================
+
+**Join Zoom CRC meetings on RoomOS devices as a host, without the need for inputting the host key.**
+
+This is a proof-of-concept application that lets anyone join Zoom Conference Room Connector (CRC) meetings as host on
+RoomOS devices using a preconfigured machine/room account.
+
+The target audience for this PoC are IT Administrators who want to emulate the Zoom Rooms scheduled meeting join
+experience on Webex RoomOS devices for users in their organization. This PoC was developed in response to Zoom API
+change as detailed [here](https://devforum.zoom.us/t/not-able-to-retrieve-host-key-using-users-api/70898).
+The change disallow retrieving a host's key using their email address, essentially making previous device macro based
+solutions useless.
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+   <a href="https://www.youtube.com/watch?v=" target="_blank">
+       <img src="" alt="zoom-auto-host-key-demo"/>
+    </a>
 </p>
 
-## About Laravel
+<!-- ⛔️ MD-MAGIC-EXAMPLE:START (TOC:collapse=true&collapseText=Click to expand) -->
+<details>
+<summary>Table of Contents (click to expand)</summary>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Overview](#overview)
+- [Setup](#setup)
+- [Demo](#demo)
+- [Disclaimer](#disclaimer)
+- [License](#license)
+- [Support](#support)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+</details>
+<!-- ⛔️ MD-MAGIC-EXAMPLE:END -->
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
+## Overview
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+At it's core, the application is a background processes that runs in response to certain events on RoomOS devices.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+These processes detect when someone tries to dial into an eligible Zoom CRC meeting and automatically adds a
+machine/room account as the host to that Zoom meeting using a Zoom Server to Server Oauth App and Zoom APIs.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+It then inputs the machine/room account's host key on the Webex RoomOS device via the DTMF xAPI command.
 
-## Laravel Sponsors
+Of course, this is an over-simplification of the steps involved.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
 
-### Premium Partners
+## Setup
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+These instructions assume that you have:
 
-## Contributing
+- Administrator access to an organization's Zoom Dashboard and Webex Control Hub.
+- [Docker installed](https://docs.docker.com/engine/install/) and running on a Windows (via WSL2), macOS, or Linux
+  machine.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Open a new terminal window and follow the instructions below to setup the project locally for development/demo.
 
-## Code of Conduct
+1. Clone this repository and change directory:
+   ```
+   git clone https://github.com/WXSD-Sales/zoom-auto-host-key && cd zoom-auto-host-key
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. Copy `.env.example` file as `.env`:
+   ```
+   cp .env.example .env
+   ```
 
-## Security Vulnerabilities
+3. Set the `APP_URL` environment variable to your host's secure public url (e.g. https://example.com).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. Review and follow the [Registering your Integration
+   on Webex](https://developer.webex.com/docs/integrations#registering-your-integration) guide.
+   - Your registration must have the following [Webex REST API scopes](https://developer.webex.com/docs/integrations#scopes):
+     | Scope                   | Description                                   |
+     |-------------------------|-----------------------------------------------|
+     | spark-admin:people_read | Access to read your user's company directory  |
+     | spark:people_read       | Access to read your user's company directory  |
+     | spark:kms               | Permission to interact with encrypted content |
+   - Use these Redirect URIs:
+     - `https://<APP_URL>/auth/webex/callback`
+     - `https://localhost/auth/webex/callback`
+     - `http://localhost/auth/webex/callback`
+   - Take note of your Client ID and Client Secret. Assign these values to the `WEBEX_CLIENT_ID`
+     and `WEBEX_CLIENT_SECRET` environment variables within the `.env` file respectively.
+
+5. [Install Composer dependencies for the application](https://laravel.com/docs/10.x/sail#installing-composer-dependencies-for-existing-projects):
+   ```
+   docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v $(pwd):/var/www/html \
+    -w /var/www/html \
+    laravelsail/php81-composer:latest \
+    composer install --ignore-platform-reqs
+   ```
+
+6. Start the Docker development environment via [Laravel Sail](https://laravel.com/docs/10.x/sail):
+   ```
+   ./vendor/bin/sail up -d
+   ```
+
+7. Generate the [application key](https://laravel.com/docs/10.x/encryption#configuration):
+   ```
+   ./vendor/bin/sail php artisan key:generate
+   ```
+
+8. Initialize the [database for the application](https://laravel.com/docs/9.x/migrations#drop-all-tables-migrate=):
+   ```
+   ./vendor/bin/sail php artisan migrate:fresh
+   ```
+
+9. Install NPM dependencies for the application:
+   ```
+   ./vendor/bin/sail npm install
+   ```
+
+10. Run [Laravel Mix](https://laravel.com/docs/9.x/mix):
+    ```
+    ./vendor/bin/sail npm run dev
+    ```
+
+Lastly, navigate to `http://localhost` or `https://<APP_URL>` in your browser to complete the setup by creating
+Webex Workspace Integration and Zoom Server to Server application. To stop, execute `./vendor/bin/sail down` on the
+terminal.
+
+
+## Demo
+
+A video where I demo this PoC is available on YouTube — https://www.youtube.com/watch?v=.
+
+
+## Disclaimer
+
+Everything included in this repository is for demo and Proof of Concept (PoC) purposes only. Use of the PoC is solely
+at your own risk. This project may contain links to external content, which we do not warrant, endorse, or assume
+liability for. This project is for Cisco Webex use-case, but is not official Cisco Webex branded project.
+
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+[MIT](./LICENSE)
+
+
+## Support
+
+Please reach out to the WXSD team at [wxsd@external.cisco.com](mailto:wxsd@external.cisco.com?cc=ashessin@cisco.com&subject=Zoom%20Auto%20Host%20Key) or contact me on Webex (ashessin@cisco.com).
