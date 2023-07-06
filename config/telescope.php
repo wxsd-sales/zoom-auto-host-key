@@ -184,4 +184,16 @@ return [
         Watchers\ScheduleWatcher::class => env('TELESCOPE_SCHEDULE_WATCHER', true),
         Watchers\ViewWatcher::class => env('TELESCOPE_VIEW_WATCHER', true),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Telescope Admin Emails
+    |--------------------------------------------------------------------------
+    |
+    | The following array lists will be used to determine who can access
+    | Telescope in non-local environment. Note that Telescope is
+    | always accessible in local environment without login.
+    |
+    */
+    'admin_emails' => explode(',', env('TELESCOPE_ADMIN_EMAILS', '')),
 ];
