@@ -65,7 +65,8 @@ Open a new terminal window and follow the instructions below to setup the projec
    cp .env.example .env
    ```
 
-3. Set the `APP_URL` environment variable to your host's secure public url (e.g. https://example.com).
+3. Set the `APP_URL` environment variable to your host's secure public url (e.g. https://example.com). You should 
+   ensure you change the `APP_ENV` environment variable to `production` when running in production environment.
 
 4. Review and follow the [Registering your Integration
    on Webex](https://developer.webex.com/docs/integrations#registering-your-integration) guide.
@@ -88,7 +89,7 @@ Open a new terminal window and follow the instructions below to setup the projec
     -u "$(id -u):$(id -g)" \
     -v $(pwd):/var/www/html \
     -w /var/www/html \
-    laravelsail/php81-composer:latest \
+    laravelsail/php82-composer:latest \
     composer install --ignore-platform-reqs
    ```
 
@@ -112,9 +113,9 @@ Open a new terminal window and follow the instructions below to setup the projec
    ./vendor/bin/sail npm install
    ```
 
-10. Run [Laravel Mix](https://laravel.com/docs/9.x/mix):
+10. Run [Vite](https://laravel.com/docs/10.x/vite):
     ```
-    ./vendor/bin/sail npm run dev
+    ./vendor/bin/sail npx vite build && npx vite build --ssr
     ```
 
 Lastly, navigate to `http://localhost` or `https://<APP_URL>` in your browser to complete the setup by creating
