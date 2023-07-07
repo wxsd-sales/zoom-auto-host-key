@@ -1,5 +1,4 @@
-Zoom Auto Host Key
-==================
+# Zoom Auto Host Key
 
 **Join Zoom CRC meetings on RoomOS devices as a host, without the need for inputting the host key.**
 
@@ -32,7 +31,6 @@ solutions useless.
 </details>
 <!-- ⛔️ MD-MAGIC-EXAMPLE:END -->
 
-
 ## Overview
 
 At it's core, the application is a background processes that runs in response to certain events on RoomOS devices.
@@ -43,7 +41,6 @@ machine/room account as the host to that Zoom meeting using a Zoom Server to Ser
 It then inputs the machine/room account's host key on the Webex RoomOS device via the DTMF xAPI command.
 
 Of course, this is an over-simplification of the steps involved.
-
 
 ## Setup
 
@@ -56,34 +53,38 @@ These instructions assume that you have:
 Open a new terminal window and follow the instructions below to setup the project locally for development/demo.
 
 1. Clone this repository and change directory:
+
    ```
    git clone https://github.com/WXSD-Sales/zoom-auto-host-key && cd zoom-auto-host-key
    ```
 
 2. Copy `.env.example` file as `.env`:
+
    ```
    cp .env.example .env
    ```
 
-3. Set the `APP_URL` environment variable to your host's secure public url (e.g. https://example.com). You should 
+3. Set the `APP_URL` environment variable to your host's secure public url (e.g. https://example.com). You should
    ensure you change the `APP_ENV` environment variable to `production` when running in production environment.
 
 4. Review and follow the [Registering your Integration
    on Webex](https://developer.webex.com/docs/integrations#registering-your-integration) guide.
+
    - Your registration must have the following [Webex REST API scopes](https://developer.webex.com/docs/integrations#scopes):
-     | Scope                   | Description                                   |
+     | Scope | Description |
      |-------------------------|-----------------------------------------------|
-     | spark-admin:people_read | Access to read your user's company directory  |
-     | spark:people_read       | Access to read your user's company directory  |
-     | spark:kms               | Permission to interact with encrypted content |
+     | spark-admin:people_read | Access to read your user's company directory |
+     | spark:people_read | Access to read your user's company directory |
+     | spark:kms | Permission to interact with encrypted content |
    - Use these Redirect URIs:
-     - `https://<APP_URL>/auth/webex/callback`
-     - `https://localhost/auth/webex/callback`
+     - `<APP_URL>/auth/webex/callback`
      - `http://localhost/auth/webex/callback`
+     - `https://localhost/auth/webex/callback`
    - Take note of your Client ID and Client Secret. Assign these values to the `WEBEX_CLIENT_ID`
      and `WEBEX_CLIENT_SECRET` environment variables within the `.env` file respectively.
 
 5. [Install Composer dependencies for the application](https://laravel.com/docs/10.x/sail#installing-composer-dependencies-for-existing-projects):
+
    ```
    docker run --rm \
     -u "$(id -u):$(id -g)" \
@@ -94,21 +95,25 @@ Open a new terminal window and follow the instructions below to setup the projec
    ```
 
 6. Start the Docker development environment via [Laravel Sail](https://laravel.com/docs/10.x/sail):
+
    ```
    ./vendor/bin/sail up -d
    ```
 
 7. Generate the [application key](https://laravel.com/docs/10.x/encryption#configuration):
+
    ```
    ./vendor/bin/sail php artisan key:generate
    ```
 
 8. Initialize the [database for the application](https://laravel.com/docs/9.x/migrations#drop-all-tables-migrate=):
+
    ```
    ./vendor/bin/sail php artisan migrate:fresh
    ```
 
 9. Install NPM dependencies for the application:
+
    ```
    ./vendor/bin/sail npm install
    ```
@@ -118,15 +123,13 @@ Open a new terminal window and follow the instructions below to setup the projec
     ./vendor/bin/sail npx vite build && npx vite build --ssr
     ```
 
-Lastly, navigate to `http://localhost` or `https://<APP_URL>` in your browser to complete the setup by creating
+Lastly, navigate to `http://localhost` or the `<APP_URL>` in your browser to complete the setup by creating
 Webex Workspace Integration and Zoom Server to Server application. To stop, execute `./vendor/bin/sail down` on the
 terminal.
-
 
 ## Demo
 
 A video where I demo this PoC is available on YouTube — https://www.youtube.com/watch?v=.
-
 
 ## Disclaimer
 
@@ -134,11 +137,9 @@ Everything included in this repository is for demo and Proof of Concept (PoC) pu
 at your own risk. This project may contain links to external content, which we do not warrant, endorse, or assume
 liability for. This project is for Cisco Webex use-case, but is not official Cisco Webex branded project.
 
-
 ## License
 
 [MIT](./LICENSE)
-
 
 ## Support
 
