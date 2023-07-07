@@ -23,4 +23,6 @@ final class OauthConstant
     public const SCOPE = 'scope';
 
     public const TOKEN_TYPE = 'token_type';
+
+    public const SECRETS = [self::CLIENT_SECRET, self::ACCESS_TOKEN, self::REFRESH_TOKEN];
 }

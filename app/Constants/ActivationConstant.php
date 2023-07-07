@@ -49,4 +49,11 @@ final class ActivationConstant
     public const ZM_S2S_OAUTH_ERRORED = 'zmS2sOauthErrored';
 
     public const HMAC_SECRET = 'hmacSecret';
+
+    public const SECRETS = [
+        self::HMAC_SECRET,
+        self::WBX_WI_JWT,
+        self::WBX_WI_CLIENT_SECRET,
+        self::ZM_S2S_CLIENT_SECRET,
+    ];
 }

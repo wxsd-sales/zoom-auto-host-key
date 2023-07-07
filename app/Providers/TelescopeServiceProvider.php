@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Constants\ActivationConstant;
+use App\Constants\OauthConstant;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
@@ -40,12 +42,15 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
             return;
         }
 
-        Telescope::hideRequestParameters(['_token']);
+        Telescope::hideRequestParameters(array_merge(
+            ['_token', 'jwt', 'secret'], ActivationConstant::SECRETS, OauthConstant::SECRETS
+        ));
 
         Telescope::hideRequestHeaders([
             'cookie',
             'x-csrf-token',
             'x-xsrf-token',
+            'x-spark-signature',
         ]);
     }
 
