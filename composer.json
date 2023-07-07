@@ -19,7 +19,6 @@
     "laravel/telescope": "^4.14",
     "laravel/tinker": "^2.8",
     "socialiteproviders/webex": "^4.0",
-    "spatie/laravel-webhook-client": "^3.1",
     "symfony/cache": "^6.3",
     "tightenco/ziggy": "^1.0"
   },
