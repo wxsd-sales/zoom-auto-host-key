@@ -6,6 +6,7 @@ use App\Traits\CamelCaseJsonSerialize;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -16,11 +17,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $wbx_wi_org_id
  * @property string $wbx_wi_manifest_id
  * @property int $wbx_wi_manifest_version
+ * @property string $wbx_wi_manifest_url
+ * @property string $wbx_wi_app_url
  * @property string $wbx_wi_display_name
  * @property string $wbx_wi_client_id
  * @property mixed $wbx_wi_client_secret
- * @property string $wbx_wi_jwt
- * @property array $wbx_wi_jwt_payload
  * @property string $zm_s2s_account_id
  * @property string $zm_s2s_client_id
  * @property mixed $zm_s2s_client_secret
@@ -31,6 +32,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WbxWiAction> $wbxWiActions
+ * @property-read int|null $wbx_wi_actions_count
  * @property-read \App\Models\WbxWiOauth|null $wbxWiOauth
  * @property-read \App\Models\ZmS2sOauth|null $zmS2sOauth
  *
@@ -43,12 +46,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereHmacSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiAppUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiClientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiClientSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiDisplayName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiJwt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiJwtPayload($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiManifestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiManifestUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiManifestVersion($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiOauthId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiOrgId($value)
@@ -79,11 +82,11 @@ class Activation extends Model
         'wbx_wi_org_id',
         'wbx_wi_manifest_id',
         'wbx_wi_manifest_version',
+        'wbx_wi_manifest_url',
+        'wbx_wi_app_url',
         'wbx_wi_display_name',
         'wbx_wi_client_id',
         'wbx_wi_client_secret',
-        'wbx_wi_jwt',
-        'wbx_wi_jwt_payload',
         'zm_s2s_account_id',
         'zm_s2s_client_id',
         'zm_s2s_client_secret',
@@ -102,8 +105,26 @@ class Activation extends Model
         'wbx_wi_client_secret' => 'encrypted',
         'zm_s2s_client_secret' => 'encrypted',
         'zm_host_accounts' => 'array',
-        'wbx_wi_jwt_payload' => 'array',
     ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<string>
+     */
+    protected $hidden = [
+        'wbx_wi_client_secret',
+        'zm_s2s_client_secret',
+        'hmac_secret',
+    ];
+
+    /**
+     * Get the Webex WI actions for the activation.
+     */
+    public function wbxWiActions(): HasMany
+    {
+        return $this->hasMany(WbxWiAction::class);
+    }
 
     /**
      * Get the Webex WI Oauth associated with the activation.

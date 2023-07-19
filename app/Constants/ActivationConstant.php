@@ -10,17 +10,21 @@ final class ActivationConstant
 
     public const WBX_WI_CONFIG = 'wbxWiConfig';
 
-    public const WBX_WI_JWT = 'wbxWiJwt';
+    public const WBX_WI_ACTION_JWT = 'wbxWiActionJwt';
 
-    public const WBX_WI_JWT_ERRORED = 'wbxWiJwtErrored';
+    public const WBX_WI_ACTION_JWT_ERRORED = 'wbxWiActionJwtErrored';
 
-    public const WBX_WI_JWT_PAYLOAD = 'wbxWiJwtPayload';
+    public const WBX_WI_ACTION_JWT_PAYLOAD = 'wbxWiActionJwtPayload';
 
     public const WBX_WI_MANIFEST = 'wbxWiManifest';
 
     public const WBX_WI_MANIFEST_ID = 'wbxWiManifestId';
 
     public const WBX_WI_MANIFEST_VERSION = 'wbxWiManifestVersion';
+
+    public const WBX_WI_MANIFEST_URL = 'wbxWiManifestUrl';
+
+    public const WBX_WI_APP_URL = 'wbxWiAppUrl';
 
     public const WBX_WI_ORG_ID = 'wbxWiOrgId';
 
@@ -52,7 +56,7 @@ final class ActivationConstant
 
     public const SECRETS = [
         self::HMAC_SECRET,
-        self::WBX_WI_JWT,
+        self::WBX_WI_ACTION_JWT,
         self::WBX_WI_CLIENT_SECRET,
         self::ZM_S2S_CLIENT_SECRET,
     ];

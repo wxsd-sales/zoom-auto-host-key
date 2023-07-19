@@ -18,7 +18,7 @@ class Has implements ValidationRule
      */
     private $valueComparer;
 
-    public function __construct(mixed $required, ?string $valueSeparator = ' ', ?callable $valueComparer = null)
+    public function __construct(mixed $required, ?string $valueSeparator = ' ', callable $valueComparer = null)
     {
         $this->required = gettype($required) === 'array' ? $required : [$required];
         $this->valueSeparator = $valueSeparator;
@@ -37,14 +37,20 @@ class Has implements ValidationRule
         if (gettype($value) === 'string' && $this->valueSeparator !== null) {
             $value = explode($this->valueSeparator, $value);
         } elseif (gettype($value) === 'string' && $this->valueSeparator === null) {
-            $value = json_decode($value, flags: JSON_THROW_ON_ERROR);
+            $value = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
         }
 
         $value = gettype($value) === 'array' ? $value : [$value];
 
         $missing = array_values($this->valueComparer !== null
-            ? array_udiff($this->required, $value, $this->valueComparer)
-            : array_diff($this->required, $value)
+            ? (array_is_list($value)
+                ? array_udiff($this->required, $value, $this->valueComparer)
+                : array_udiff_assoc($this->required, $value, $this->valueComparer)
+            )
+            : (array_is_list($value)
+                ? array_diff($this->required, $value)
+                : array_diff_assoc($this->required, $value)
+            )
         );
 
         if (count($missing) > 0) {

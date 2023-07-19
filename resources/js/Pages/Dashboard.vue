@@ -2,7 +2,7 @@
 import { Link, useForm } from '@inertiajs/vue3';
 
 interface Props {
-  activations: unknown[];
+  activations: any[];
 }
 
 withDefaults(defineProps<Props>(), {
@@ -41,6 +41,7 @@ const form = useForm({});
         </div>
         <div class="column is-3">
           <a
+            v-show="false"
             class="button is-fullwidth is-rounded is-warning is-light is-justify-content-space-between"
             :href="route('activations.edit', activation.id)"
           >
@@ -51,6 +52,7 @@ const form = useForm({});
           </a>
         </div>
         <form
+          v-show="false"
           class="column is-3"
           @submit.prevent="form.delete(route('activations.destroy', activation.id), { preserveScroll: true })"
         >
@@ -76,7 +78,7 @@ const form = useForm({});
             <p class="level-left">created</p>
             <p class="level-right">{{ new Date(activation.createdAt).toLocaleString() }}</p>
           </div>
-          <div class="level is-mobile mb-0">
+          <div v-if="activation.deletedAt" class="level is-mobile mb-0">
             <p class="level-left">deleted</p>
             <p class="level-right">{{ new Date(activation.deletedAt).toLocaleString() }}</p>
           </div>

@@ -13,8 +13,8 @@ class HydraId implements ValidationRule
 
     public function __construct(string $id, bool $strict = false)
     {
-        $this->strict = $strict;
         $this->id = $id;
+        $this->strict = $strict;
     }
 
     /**
@@ -22,8 +22,8 @@ class HydraId implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $valueDecoded = base64_decode($value) !== false ? base64_decode($value) : $value;
-        $idDecoded = base64_decode($this->id) !== false ? base64_decode($this->id) : $this->id;
+        $valueDecoded = base64_decode($value, true) !== false ? base64_decode($value) : $value;
+        $idDecoded = base64_decode($this->id, true) !== false ? base64_decode($this->id) : $this->id;
 
         if ($this->strict) {
             $isValid = $valueDecoded === $idDecoded;

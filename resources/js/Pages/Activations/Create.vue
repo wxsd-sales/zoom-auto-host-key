@@ -4,12 +4,12 @@ import { useForm, Head } from '@inertiajs/vue3';
 import Prerequisites from '@/Components/Activations/Create/Step0Prerequisites.vue';
 import DeployManifest from '@/Components/Activations/Create/Step1DeployManifest.vue';
 import ProvideOauthCredentials from '@/Components/Activations/Create/Step2ProvideOauthCredentials.vue';
-import ProvideActivationCode from '@/Components/Activations/Create/Step3ProvideJwt.vue';
+import ProvideActivationCode from '@/Components/Activations/Create/Step3ProvideActionsJwt.vue';
 import CreateServerToServerApp from '@/Components/Activations/Create/Step4CreateServerToServerOauthApp.vue';
 import AddMeetingHostAccounts from '@/Components/Activations/Create/Step5AddMeetingHostAccounts.vue';
 
 interface Props {
-  actionUrl: string;
+  actionUrl?: string;
   wbxWiConfig: {
     id: string;
     displayName: string;
@@ -38,7 +38,7 @@ const form = useForm({
   wbxWiManifest: props.wbxWiConfig,
   wbxWiClientId: props.wbxWiClientId,
   wbxWiClientSecret: null,
-  wbxWiJwt: null,
+  wbxWiActionJwt: null,
   zmS2sAccountId: props.zmS2sAccountId,
   zmS2sClientId: props.zmS2sClientId,
   zmS2sClientSecret: null,
@@ -50,11 +50,12 @@ const form = useForm({
   <Head>
     <title>Create Activation</title>
   </Head>
+  <!--  {{ route('activations.update') }}-->
   <form
     id="demo-activate"
     class="container px-4 mb-6"
     autocomplete="off"
-    @submit.prevent="form.post(actionUrl, { preserveScroll: true })"
+    @submit.prevent="form.post(actionUrl ?? route('activations.store'), { preserveScroll: true })"
   >
     <Prerequisites />
     <hr />
@@ -72,7 +73,7 @@ const form = useForm({
       :processing="form.processing"
     />
     <hr />
-    <ProvideActivationCode v-model:jwt="form.wbxWiJwt" :errors="errors" :processing="form.processing" />
+    <ProvideActivationCode v-model:jwt="form.wbxWiActionJwt" :errors="errors" :processing="form.processing" />
     <hr />
     <CreateServerToServerApp
       v-model:account-id="form.zmS2sAccountId"
@@ -83,7 +84,11 @@ const form = useForm({
       :processing="form.processing"
     />
     <hr />
-    <AddMeetingHostAccounts v-model:host-accounts="form.zmHostAccounts" :errors="errors" />
+    <AddMeetingHostAccounts
+      v-model:host-accounts="form.zmHostAccounts"
+      :errors="errors"
+      :processing="form.processing"
+    />
     <hr />
     <div class="columns is-multiline">
       <div class="column is-12">

@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+php artisan ide-helper:generat
+php artisan ide-helper:models --write --reset
+php artisan ide-helper:meta
+
+npm run format
+npm run lint

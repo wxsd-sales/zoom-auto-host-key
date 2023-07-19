@@ -82,6 +82,16 @@ class Account extends Model
     ];
 
     /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<string>
+     */
+    protected $hidden = [
+        'refresh_token',
+        'access_token',
+    ];
+
+    /**
      * Get the user that owns the account.
      */
     public function user(): BelongsTo

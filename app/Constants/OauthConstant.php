@@ -4,6 +4,8 @@ namespace App\Constants;
 
 final class OauthConstant
 {
+    public const ACCOUNT_ID = 'account_id';
+
     public const ACCESS_TOKEN = 'access_token';
 
     public const CLIENT_ID = 'client_id';

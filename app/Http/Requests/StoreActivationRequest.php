@@ -30,8 +30,8 @@ class StoreActivationRequest extends ActivationRequest
             ActivationConstant::WBX_WI_CLIENT_SECRET => [
                 'required', 'string', 'max:255',
             ],
-            ActivationConstant::WBX_WI_JWT => [
-                'required', 'string', 'unique:activations,wbx_wi_jwt',
+            ActivationConstant::WBX_WI_ACTION_JWT => [
+                'required', 'string', 'unique:wbx_wi_actions,jwt',
             ],
             ActivationConstant::ZM_S2S_ACCOUNT_ID => [
                 'required', 'string', 'max:255',
@@ -42,8 +42,14 @@ class StoreActivationRequest extends ActivationRequest
             ActivationConstant::ZM_S2S_CLIENT_SECRET => [
                 'required', 'string', 'max:255',
             ],
-            ActivationConstant::ZM_HOST_ACCOUNTS.'.*' => [
-                'sometimes', 'email', 'distinct:ignore_case',
+            ActivationConstant::ZM_HOST_ACCOUNTS => [
+                'sometimes', 'array', 'min:1', 'max:25',
+            ],
+            ActivationConstant::ZM_HOST_ACCOUNTS.'.*.email' => [
+                'required', 'email', 'distinct:ignore_case',
+            ],
+            ActivationConstant::ZM_HOST_ACCOUNTS.'.*.key' => [
+                'required', 'string', 'digits:6',
             ],
         ];
     }
@@ -53,11 +59,13 @@ class StoreActivationRequest extends ActivationRequest
         return [
             ActivationConstant::WBX_WI_CLIENT_ID => 'Webex Workspace Integration OAuth Client ID',
             ActivationConstant::WBX_WI_CLIENT_SECRET => 'Webex Workspace Integration OAuth Client Secret',
-            ActivationConstant::WBX_WI_JWT => 'Webex Workspace Integration JWT (Activation/Update code)',
+            ActivationConstant::WBX_WI_ACTION_JWT => 'Webex Workspace Integration JWT (Activation/Update code)',
             ActivationConstant::ZM_S2S_ACCOUNT_ID => 'Zoom Server to Server OAuth app Account ID',
             ActivationConstant::ZM_S2S_CLIENT_ID => 'Zoom Server to Server OAuth app Client ID',
             ActivationConstant::ZM_S2S_CLIENT_SECRET => 'Zoom Server to Server OAuth app Client Secret',
-            ActivationConstant::ZM_HOST_ACCOUNTS.'.*' => 'Zoom Host Account',
+            ActivationConstant::ZM_HOST_ACCOUNTS => 'Zoom Host Account',
+            ActivationConstant::ZM_HOST_ACCOUNTS.'.*.email' => 'Zoom Host Account Email',
+            ActivationConstant::ZM_HOST_ACCOUNTS.'.*.key' => 'Zoom Host Account Key',
         ];
     }
 }

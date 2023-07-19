@@ -36,7 +36,7 @@ watch(
   <div class="columns is-multiline">
     <div class="column is-full">
       <h2 class="subtitle">Step #3</h2>
-      <h2 class="title">Provide JWT</h2>
+      <h2 class="title">Provide Actions JWT</h2>
     </div>
     <div class="column is-full content mb-0">
       <p>
@@ -69,7 +69,7 @@ watch(
           />
         </span>
       </div>
-      <p v-if="errors?.wbxWiJwt" class="help is-danger">{{ errors?.wbxWiJwt }}</p>
+      <p v-if="errors?.wbxWiActionJwt" class="help is-danger">{{ errors?.wbxWiActionJwt }}</p>
       <p v-else class="help">
         Copy-paste the Activation Code that you see on the Activate Integration Webex Control Hub page.
       </p>

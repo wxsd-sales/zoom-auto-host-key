@@ -6,27 +6,21 @@ use App\Constants\ActivationConstant;
 use App\Constants\OauthConstant;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class ZoomService
 {
-    const SERVER_TO_SERVER_OAUTH_KEYS = [
-        ActivationConstant::ZM_S2S_ACCOUNT_ID,
-        ActivationConstant::ZM_S2S_CLIENT_ID,
-        ActivationConstant::ZM_S2S_CLIENT_SECRET,
-    ];
-
     /**
      * Retrieves OAuth token for a Server to Server application using provided data.
      */
     public static function getServerToServerOauth(array $data, Pool $pool = null): PromiseInterface|Response
     {
-        $accountId = $data[ActivationConstant::ZM_S2S_ACCOUNT_ID];
-        $clientId = $data[ActivationConstant::ZM_S2S_CLIENT_ID];
-        $clientSecret = $data[ActivationConstant::ZM_S2S_CLIENT_SECRET];
+        $accountId = $data[OauthConstant::ACCOUNT_ID] ?? $data[ActivationConstant::ZM_S2S_ACCOUNT_ID];
+        $clientId = $data[OauthConstant::CLIENT_ID] ?? $data[ActivationConstant::ZM_S2S_CLIENT_ID];
+        $clientSecret = $data[OauthConstant::CLIENT_SECRET] ?? $data[ActivationConstant::ZM_S2S_CLIENT_SECRET];
         $oauthUrl = config('services.zoom.oauth_url');
         $oauthBody = [OauthConstant::GRANT_TYPE => 'account_credentials', 'account_id' => $accountId];
 
@@ -35,7 +29,7 @@ class ZoomService
     }
 
     /**
-     * Validates OAuth token for a Server to Server application.
+     * Creates OAuth token validator for a Server to Server application.
      */
     public static function getServerToServerOauthValidator($data): Validator
     {

@@ -17,11 +17,11 @@ return new class extends Migration
             $table->string('wbx_wi_org_id');
             $table->string('wbx_wi_manifest_id');
             $table->integer('wbx_wi_manifest_version');
+            $table->string('wbx_wi_manifest_url');
+            $table->string('wbx_wi_app_url');
             $table->string('wbx_wi_display_name');
             $table->string('wbx_wi_client_id')->unique();
             $table->string('wbx_wi_client_secret');
-            $table->text('wbx_wi_jwt')->unique();
-            $table->json('wbx_wi_jwt_payload');
             $table->string('zm_s2s_account_id');
             $table->string('zm_s2s_client_id')->unique();
             $table->string('zm_s2s_client_secret');

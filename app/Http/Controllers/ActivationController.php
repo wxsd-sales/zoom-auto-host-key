@@ -6,12 +6,13 @@ use App\Constants\ActivationConstant;
 use App\Http\Requests\StoreActivationRequest;
 use App\Http\Requests\UpdateActivationRequest;
 use App\Models\Activation;
+use App\Models\WbxWiAction;
 use App\Models\WbxWiOauth;
 use App\Models\ZmS2sOauth;
+use App\Services\WebexService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
@@ -63,11 +64,18 @@ class ActivationController extends Controller
             'id' => $request['id'],
             ...$request->validated(),
             ActivationConstant::HMAC_SECRET => Str::password(),
-            ActivationConstant::WBX_WI_ORG_ID => basename(base64_decode($request->wbxWiJwtPayload['sub'])),
+            ActivationConstant::WBX_WI_ORG_ID => basename(base64_decode($request->wbxWiActionJwtPayload['sub'])),
             ActivationConstant::WBX_WI_MANIFEST_ID => $request->wbxWiManifest['id'],
             ActivationConstant::WBX_WI_MANIFEST_VERSION => $request->wbxWiManifest['manifestVersion'],
             ActivationConstant::WBX_WI_DISPLAY_NAME => $request->wbxWiManifest['displayName'],
-            ActivationConstant::WBX_WI_JWT_PAYLOAD => $request->wbxWiJwtPayload,
+            ActivationConstant::WBX_WI_MANIFEST_URL => $request->wbxWiActionJwtPayload['manifestUrl'],
+            ActivationConstant::WBX_WI_APP_URL => $request->wbxWiActionJwtPayload['appUrl'],
+        ]);
+        $wbxWiActionAttributes = collect([
+            'activationId' => $activationAttributes['id'],
+            'jwtPayload' => $request->wbxWiActionJwtPayload,
+            'jwt' => $request->validated(ActivationConstant::WBX_WI_ACTION_JWT),
+            ...$request->wbxWiActionJwtPayload,
         ]);
         $wbxWiOauthAttributes = collect([
             'activationId' => $activationAttributes['id'],
@@ -80,36 +88,25 @@ class ActivationController extends Controller
             ...$request->zmS2sOauth,
         ]);
 
-        $activation = Activation::make($activationAttributes->snakeCaseKeys(0)->toArray());
-        $wbxWiOauth = WbxWiOauth::make($wbxWiOauthAttributes->snakeCaseKeys(0)->toArray());
-        $zmS2sOauth = ZmS2sOauth::make($zmS2sOauthAttributes->snakeCaseKeys(0)->toArray());
+        [$activation, $wbxWiOauth, $zmS2sOauth, $wbxWiAction] = [
+            Activation::make($activationAttributes->snakeCaseKeys(0)->toArray()),
+            WbxWiOauth::make($wbxWiOauthAttributes->snakeCaseKeys(0)->toArray()),
+            ZmS2sOauth::make($zmS2sOauthAttributes->snakeCaseKeys(0)->toArray()),
+            WbxWiAction::make($wbxWiActionAttributes->snakeCaseKeys(0)->toArray()),
+        ];
 
-        DB::transaction(function () use ($activation, $wbxWiOauth, $zmS2sOauth) {
+        DB::transaction(function () use ($activation, $wbxWiOauth, $zmS2sOauth, $wbxWiAction) {
             array_map(
-                fn (Model $model) => $model->save(), [$activation, $wbxWiOauth, $zmS2sOauth]
+                fn (Model $model) => $model->save(), [$activation, $wbxWiOauth, $zmS2sOauth, $wbxWiAction]
             );
-            $activation->wbxWiOauth()->save($wbxWiOauth);
-            $activation->zmS2sOauth()->save($zmS2sOauth);
 
-            $actionsUrl = config('app.url').route('activations.actions', $activation, false);
-            $webhookUrl = config('app.url').route('activations.webhook', $activation, false);
-
-            $activationResponse = Http::withToken($wbxWiOauth->access_token)->patch(
-                $activation->wbx_wi_jwt_payload['appUrl'],
-                [
-                    'provisioningState' => 'completed',
-                    'actionsUrl' => $actionsUrl,
-                    'webhook' => [
-                        'targetUrl' => $webhookUrl,
-                        'type' => 'hmac_signature',
-                        'secret' => $activation->hmac_secret,
-                    ],
-                    'customer' => [
-                        'id' => $activation->wbx_wi_org_id,
-                    ],
-                ]
-            )->throw();
+            $activation->wbx_wi_oauth_id = $wbxWiOauth->id;
+            $activation->zm_s2s_oauth_id = $zmS2sOauth->id;
+            $activation->save();
+            WebexService::activateWorkspaceIntegration($activation)->throw();
         });
+
+        return redirect()->action([ActivationController::class, 'index']);
     }
 
     /**

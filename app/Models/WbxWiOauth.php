@@ -70,6 +70,16 @@ class WbxWiOauth extends Model
     ];
 
     /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<string>
+     */
+    protected $hidden = [
+        'refresh_token',
+        'access_token',
+    ];
+
+    /**
      * Get the activation that owns the oauth.
      */
     public function activation(): BelongsTo

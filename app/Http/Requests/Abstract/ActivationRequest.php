@@ -4,6 +4,7 @@ namespace App\Http\Requests\Abstract;
 
 use App\Constants\ActivationConstant;
 use App\Constants\OauthConstant;
+use App\Services\OauthService;
 use App\Services\WebexService;
 use App\Services\ZoomService;
 use Illuminate\Foundation\Http\FormRequest;
@@ -20,48 +21,88 @@ use UnexpectedValueException;
 
 abstract class ActivationRequest extends FormRequest
 {
+    protected const JWT = ActivationConstant::WBX_WI_ACTION_JWT;
+
+    protected const JWT_PAYLOAD = ActivationConstant::WBX_WI_ACTION_JWT_PAYLOAD;
+
+    protected const JWT_ERRORED = ActivationConstant::WBX_WI_ACTION_JWT_ERRORED;
+
+    protected const WBX_WI_OAUTH = ActivationConstant::WBX_WI_OAUTH;
+
+    protected const WBX_WI_CLIENT_ID = ActivationConstant::WBX_WI_CLIENT_ID;
+
+    protected const WBX_WI_CLIENT_SECRET = ActivationConstant::WBX_WI_CLIENT_SECRET;
+
+    protected const WBX_WI_OAUTH_ERRORED = ActivationConstant::WBX_WI_OAUTH_ERRORED;
+
+    protected const ZM_S2S_OAUTH = ActivationConstant::ZM_S2S_OAUTH;
+
+    protected const ZM_S2S_ACCOUNT_ID = ActivationConstant::ZM_S2S_ACCOUNT_ID;
+
+    protected const ZM_S2S_CLIENT_ID = ActivationConstant::ZM_S2S_CLIENT_ID;
+
+    protected const ZM_S2S_CLIENT_SECRET = ActivationConstant::ZM_S2S_CLIENT_SECRET;
+
+    protected const ZM_S2S_OAUTH_ERRORED = ActivationConstant::ZM_S2S_OAUTH_ERRORED;
+
+    protected const MANIFEST = ActivationConstant::WBX_WI_MANIFEST;
+
+    protected const MANIFEST_ERRORED = ActivationConstant::WBX_WI_MANIFEST_ERRORED;
+
+    const WBX_WI_MANIFEST_KEYS = [
+        self::JWT_PAYLOAD.'.'.'manifestUrl',
+        self::WBX_WI_OAUTH.'.'.OauthConstant::ACCESS_TOKEN,
+    ];
+
+    const WBX_WI_OAUTH_KEYS = [
+        self::JWT_PAYLOAD.'.'.'refreshToken',
+        self::WBX_WI_CLIENT_ID,
+        self::WBX_WI_CLIENT_SECRET,
+    ];
+
+    const ZM_S2S_OAUTH_KEYS = [
+        self::ZM_S2S_ACCOUNT_ID,
+        self::ZM_S2S_CLIENT_ID,
+        self::ZM_S2S_CLIENT_SECRET,
+    ];
+
     protected $stopOnFirstFailure = true;
 
-    public readonly array|null $wbxWiJwtPayload;
+    public readonly ?array $wbxWiActionJwtPayload;
 
-    public readonly array|null $wbxWiOauth;
+    public readonly ?array $wbxWiOauth;
 
-    public readonly array|null $zmS2sOauth;
+    public readonly ?array $zmS2sOauth;
 
     public mixed $wbxWiManifest;
 
     protected static function addJwtPayloadData(array $data): array
     {
-        Log::debug(__METHOD__);
-        [${ActivationConstant::WBX_WI_JWT_PAYLOAD}, ${ActivationConstant::WBX_WI_JWT_ERRORED}] = [null, null];
+        [${static::JWT_PAYLOAD}, ${static::JWT_ERRORED}] = [null, null];
 
-        if (isset($data[ActivationConstant::WBX_WI_JWT])) {
+        if (isset($data[static::JWT])) {
             try {
-                ${ActivationConstant::WBX_WI_JWT_PAYLOAD} = WebexService::getWorkspaceIntegrationJwtPayload($data);
+                ${static::JWT_PAYLOAD} = WebexService::getWorkspaceIntegrationJwtPayload($data);
             } catch (UnexpectedValueException $e) {
                 Log::debug($e);
-                ${ActivationConstant::WBX_WI_JWT_ERRORED} = $e;
+                ${static::JWT_ERRORED} = $e;
             } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
                 Log::debug($e);
-                ${ActivationConstant::WBX_WI_JWT_ERRORED} = 'Unexpected server error while decoding JWT.';
+                ${static::JWT_ERRORED} = 'Unexpected server error while decoding JWT.';
             }
         } else {
-            ${ActivationConstant::WBX_WI_JWT_ERRORED} = 'Unable to decode JWT due to missing on invalid data.';
+            ${static::JWT_ERRORED} = 'Unable to decode JWT due to missing on invalid data.';
         }
 
-        return array_merge($data, compact(
-            ActivationConstant::WBX_WI_JWT_PAYLOAD, ActivationConstant::WBX_WI_JWT_ERRORED
-        ));
+        return array_merge($data, compact(static::JWT_PAYLOAD, static::JWT_ERRORED));
     }
 
     protected static function addOauthTokenData(array $data): array
     {
-        Log::debug(__METHOD__);
-        [${ActivationConstant::WBX_WI_OAUTH}, ${ActivationConstant::WBX_WI_OAUTH_ERRORED}] = [null, null];
-        [${ActivationConstant::ZM_S2S_OAUTH}, ${ActivationConstant::ZM_S2S_OAUTH_ERRORED}] = [null, null];
-        $hasWbxWiOauthKeys = Arr::has($data, WebexService::WORKSPACE_INTEGRATION_OAUTH_KEYS);
-        $hasZmS2sOauthKeys = Arr::has($data, ZoomService::SERVER_TO_SERVER_OAUTH_KEYS);
-        $now = now()->timestamp;
+        [${self::WBX_WI_OAUTH}, ${self::WBX_WI_OAUTH_ERRORED}] = [null, null];
+        [${self::ZM_S2S_OAUTH}, ${self::ZM_S2S_OAUTH_ERRORED}] = [null, null];
+        $hasWbxWiOauthKeys = Arr::has($data, self::WBX_WI_OAUTH_KEYS);
+        $hasZmS2sOauthKeys = Arr::has($data, self::ZM_S2S_OAUTH_KEYS);
 
         $responses = Http::pool(fn (Pool $pool) => [
             $hasWbxWiOauthKeys ? WebexService::getWorkspaceIntegrationOauth($data, $pool) : null,
@@ -70,79 +111,65 @@ abstract class ActivationRequest extends FormRequest
 
         if ($hasWbxWiOauthKeys && isset($responses[0])) {
             try {
-                $json = $responses[0]->throw()->json();
-                ${OauthConstant::EXPIRES_IN} = $json[OauthConstant::EXPIRES_IN];
-                ${OauthConstant::EXPIRES_AT} = ${OauthConstant::EXPIRES_IN} !== null ?
-                    $now + ${OauthConstant::EXPIRES_IN} : null;
-                ${ActivationConstant::WBX_WI_OAUTH} = array_merge(compact(OauthConstant::EXPIRES_AT), $json);
+                ${self::WBX_WI_OAUTH} = OauthService::addExpiresAt($responses[0]->throw()->json());
             } catch (RequestException $e) {
                 Log::debug($e);
-                ${ActivationConstant::WBX_WI_OAUTH_ERRORED} = $e->response->json();
+                ${self::WBX_WI_OAUTH_ERRORED} = $e->response->json();
             } catch (ConnectionException) {
                 Log::debug($e);
-                ${ActivationConstant::WBX_WI_OAUTH_ERRORED} = 'Connection timeout while making request.';
+                ${self::WBX_WI_OAUTH_ERRORED} = 'Connection timeout while making request.';
             }
         } else {
             $message = 'Unable to get Oauth token due to missing on invalid data.';
-            ${ActivationConstant::WBX_WI_OAUTH_ERRORED} = $hasZmS2sOauthKeys ? $message : null;
+            ${self::WBX_WI_OAUTH_ERRORED} = $hasZmS2sOauthKeys ? $message : null;
         }
 
         if ($hasZmS2sOauthKeys && isset($responses[1])) {
             try {
-                $json = $responses[1]->throw()->json();
-                ${OauthConstant::EXPIRES_IN} = $json[OauthConstant::EXPIRES_IN];
-                ${OauthConstant::EXPIRES_AT} = ${OauthConstant::EXPIRES_IN} !== null ?
-                    $now + ${OauthConstant::EXPIRES_IN} : null;
-                ${ActivationConstant::ZM_S2S_OAUTH} = array_merge(compact(OauthConstant::EXPIRES_AT), $json);
+                ${self::ZM_S2S_OAUTH} = OauthService::addExpiresAt($responses[1]->throw()->json());
             } catch (RequestException $e) {
                 Log::debug($e);
-                ${ActivationConstant::ZM_S2S_OAUTH_ERRORED} = $e->response->json();
+                ${self::ZM_S2S_OAUTH_ERRORED} = $e->response->json();
             } catch (ConnectionException) {
                 Log::debug($e);
-                ${ActivationConstant::ZM_S2S_OAUTH_ERRORED} = 'Connection timeout while making request.';
+                ${self::ZM_S2S_OAUTH_ERRORED} = 'Connection timeout while making request.';
             }
         } else {
             $message = 'Unable to get Oauth token due to missing on invalid data.';
-            ${ActivationConstant::ZM_S2S_OAUTH_ERRORED} = $hasWbxWiOauthKeys ? $message : null;
+            ${self::ZM_S2S_OAUTH_ERRORED} = $hasWbxWiOauthKeys ? $message : null;
         }
 
         return array_merge($data,
-            compact(ActivationConstant::WBX_WI_OAUTH, ActivationConstant::WBX_WI_OAUTH_ERRORED),
-            compact(ActivationConstant::ZM_S2S_OAUTH, ActivationConstant::ZM_S2S_OAUTH_ERRORED)
+            compact(self::WBX_WI_OAUTH, self::WBX_WI_OAUTH_ERRORED),
+            compact(self::ZM_S2S_OAUTH, self::ZM_S2S_OAUTH_ERRORED)
         );
     }
 
     protected static function addManifestData(array $data): array
     {
-        Log::debug(__METHOD__);
-        [${ActivationConstant::WBX_WI_MANIFEST}, ${ActivationConstant::WBX_WI_MANIFEST_ERRORED}] = [null, null];
+        [${self::MANIFEST}, ${self::MANIFEST_ERRORED}] = [null, null];
 
-        if (Arr::has($data, WebexService::WORKSPACE_INTEGRATION_MANIFEST_KEYS)) {
+        if (Arr::has($data, self::WBX_WI_MANIFEST_KEYS)) {
             try {
-                ${ActivationConstant::WBX_WI_MANIFEST} = WebexService::getWorkspaceIntegrationManifest($data)
-                    ->throw()
-                    ->json();
+                ${self::MANIFEST} = WebexService::getWorkspaceIntegrationManifest($data)->throw()->json();
             } catch (RequestException $e) {
                 Log::debug($e);
-                ${ActivationConstant::WBX_WI_MANIFEST_ERRORED} = $e->response->json();
+                ${self::MANIFEST_ERRORED} = $e->response->json();
             } catch (ConnectionException) {
                 Log::debug($e);
-                ${ActivationConstant::WBX_WI_MANIFEST_ERRORED} = 'Connection timeout while making request.';
+                ${self::MANIFEST_ERRORED} = 'Connection timeout while making request.';
             }
         } else {
-            ${ActivationConstant::WBX_WI_MANIFEST_ERRORED} = 'Unable to get Manifest due to missing on invalid data.';
+            ${self::MANIFEST_ERRORED} = 'Unable to get Manifest due to missing on invalid data.';
         }
 
-        return array_merge($data, compact(
-            ActivationConstant::WBX_WI_MANIFEST, ActivationConstant::WBX_WI_MANIFEST_ERRORED)
-        );
+        return array_merge($data, compact(self::MANIFEST, self::MANIFEST_ERRORED));
     }
 
     protected function performJwtPayloadValidation(Validator $validator, array $data, $callback = null): Validator
     {
-        Log::debug(__METHOD__);
         $jwtPayloadValidator = WebexService::getWorkspaceIntegrationJwtPayloadValidator(
-            $data[ActivationConstant::WBX_WI_JWT_PAYLOAD] ?? [], $this
+            $data[static::JWT_PAYLOAD] ?? [], $this
         );
 
         if ($callback !== null) {
@@ -150,10 +177,11 @@ abstract class ActivationRequest extends FormRequest
         }
 
         if ($validator->errors()->isEmpty() && $jwtPayloadValidator->fails()) {
-            $message = $data[ActivationConstant::WBX_WI_JWT_PAYLOAD] === null
-                ? $data[ActivationConstant::WBX_WI_JWT_ERRORED] ?? 'Could not validate JWT.'
+            Log::debug($jwtPayloadValidator->messages());
+            $message = $data[static::JWT_PAYLOAD] === null
+                ? $data[static::JWT_ERRORED] ?? 'Could not validate JWT.'
                 : 'Duplicate, invalid or expired JWT.';
-            $validator->errors()->add(ActivationConstant::WBX_WI_JWT, $message);
+            $validator->errors()->add(static::JWT, $message);
         }
 
         return $jwtPayloadValidator;
@@ -161,9 +189,8 @@ abstract class ActivationRequest extends FormRequest
 
     protected function performManifestValidation(Validator $validator, array $data, $callback = null): Validator
     {
-        Log::debug(__METHOD__);
         $manifestValidator = WebexService::getWorkspaceIntegrationManifestValidator(
-            $data[ActivationConstant::WBX_WI_MANIFEST] ?? [], $this
+            $data[self::MANIFEST] ?? [], $this
         );
 
         if ($callback !== null) {
@@ -171,18 +198,20 @@ abstract class ActivationRequest extends FormRequest
         }
 
         if ($validator->errors()->isEmpty() && $manifestValidator->fails()) {
-            $message = $data[ActivationConstant::WBX_WI_MANIFEST_ERRORED] ?? 'Unexpected Manifest uploaded.';
-            $validator->errors()->add(ActivationConstant::WBX_WI_MANIFEST, $message);
+            $message = $data[self::MANIFEST_ERRORED] ?? 'Unexpected Manifest uploaded.';
+            $validator->errors()->add(self::MANIFEST, $message);
         }
 
         return $manifestValidator;
     }
 
+    /**
+     * Validates OAuth token for the Webex Workspace Integration application.
+     */
     protected function performWebexOauthValidation(Validator $validator, array $data, $callback = null): Validator
     {
-        Log::debug(__METHOD__);
         $oauthValidator = WebexService::getWorkspaceIntegrationOauthValidator(
-            $data[ActivationConstant::WBX_WI_OAUTH] ?? []
+            $data[static::WBX_WI_OAUTH] ?? []
         );
 
         if ($callback !== null) {
@@ -190,27 +219,27 @@ abstract class ActivationRequest extends FormRequest
         }
 
         if ($validator->errors()->isEmpty() && $oauthValidator->fails()) {
-            $message = $data[ActivationConstant::WBX_WI_OAUTH_ERRORED] ?? 'Could not retrieve valid token.';
-            $validator->errors()->add(ActivationConstant::WBX_WI_CLIENT_SECRET, $message);
+            $message = $data[static::WBX_WI_OAUTH_ERRORED] ?? 'Could not retrieve valid token.';
+            $validator->errors()->add(static::WBX_WI_CLIENT_SECRET, $message);
         }
 
         return $oauthValidator;
     }
 
+    /**
+     * Validates OAuth token for the Zoom Server to Server application.
+     */
     protected function performZoomOauthValidation(Validator $validator, array $data, $callback = null): Validator
     {
-        Log::debug(__METHOD__);
-        $oauthValidator = ZoomService::getServerToServerOauthValidator(
-            $data[ActivationConstant::ZM_S2S_OAUTH] ?? []
-        );
+        $oauthValidator = ZoomService::getServerToServerOauthValidator($data[self::ZM_S2S_OAUTH] ?? []);
 
         if ($callback !== null) {
             $oauthValidator->after(fn () => $callback($data));
         }
 
         if ($validator->errors()->isEmpty() && $oauthValidator->fails()) {
-            $message = $data[ActivationConstant::ZM_S2S_OAUTH_ERRORED] ?? 'Could not retrieve valid token.';
-            $validator->errors()->add(ActivationConstant::ZM_S2S_CLIENT_SECRET, $message);
+            $message = $data[self::ZM_S2S_OAUTH_ERRORED] ?? 'Could not retrieve valid token.';
+            $validator->errors()->add(self::ZM_S2S_CLIENT_SECRET, $message);
         }
 
         return $oauthValidator;
@@ -223,25 +252,25 @@ abstract class ActivationRequest extends FormRequest
         $data = self::addOauthTokenData($data);
         $data = self::addManifestData($data);
 
-        $setWorkspaceIntegrationJwtPayload = function ($data) {
-            $this->wbxWiJwtPayload = $data[ActivationConstant::WBX_WI_JWT_PAYLOAD] ?? null;
+        $setWorkspaceIntegrationActionJwtPayload = function ($data) {
+            $this->wbxWiActionJwtPayload = $data[self::JWT_PAYLOAD] ?? null;
         };
 
         $setWorkspaceIntegrationManifest = function ($data) {
-            $this->wbxWiManifest = $data[ActivationConstant::WBX_WI_MANIFEST] ?? null;
+            $this->wbxWiManifest = $data[self::MANIFEST] ?? null;
         };
 
         $setWorkspaceIntegrationOauth = function ($data) {
-            $this->wbxWiOauth = $data[ActivationConstant::WBX_WI_OAUTH] ?? null;
+            $this->wbxWiOauth = $data[self::WBX_WI_OAUTH] ?? null;
         };
 
         $setServer2serverOauth = function ($data) {
-            $this->zmS2sOauth = $data[ActivationConstant::ZM_S2S_OAUTH] ?? null;
+            $this->zmS2sOauth = $data[self::ZM_S2S_OAUTH] ?? null;
         };
 
         return [
             fn ($validator) => $this->performJwtPayloadValidation(
-                $validator, $data, $setWorkspaceIntegrationJwtPayload
+                $validator, $data, $setWorkspaceIntegrationActionJwtPayload
             ),
             fn ($validator) => $this->performWebexOauthValidation($validator, $data, $setWorkspaceIntegrationOauth),
             fn ($validator) => $this->performManifestValidation($validator, $data, $setWorkspaceIntegrationManifest),

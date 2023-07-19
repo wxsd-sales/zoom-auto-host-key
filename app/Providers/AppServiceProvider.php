@@ -42,8 +42,8 @@ class AppServiceProvider extends ServiceProvider
             fn (
                 int $depth = PHP_INT_MAX,
                 ?array $objectifies = [],
-                ?callable $keyTransformer = null,
-                ?callable $valueTransformer = null
+                callable $keyTransformer = null,
+                callable $valueTransformer = null
                 // Use the map mapWithKeys to iterate over the items in the collection.
             ): Collection => $this->mapWithKeys(function ($item, $key) use (
                 $depth, $objectifies, $keyTransformer, $valueTransformer
@@ -94,6 +94,9 @@ class AppServiceProvider extends ServiceProvider
             )
         );
 
+        Collection::macro('studlyCaseKeys', fn ($depth = PHP_INT_MAX): Collection => $this->recursive(
+            $depth, [], fn ($key) => gettype($key) === 'integer' ? $key : Str::studly($key))
+        );
         Collection::macro('camelCaseKeys', fn ($depth = PHP_INT_MAX): Collection => $this->recursive(
             $depth, [], fn ($key) => gettype($key) === 'integer' ? $key : Str::camel($key))
         );
@@ -105,7 +108,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Rule::macro('has', fn (
-            string|array $required, ?string $valueSeparator = ' ', ?callable $valueComparer = null
+            string|array $required, ?string $valueSeparator = ' ', callable $valueComparer = null
         ): Has => new Has($required, $valueSeparator, $valueComparer));
 
         Rule::macro('hydraId', fn (string $match, bool $strict = false): HydraId => new HydraId($match, $strict));

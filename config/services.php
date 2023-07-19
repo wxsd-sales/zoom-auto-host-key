@@ -32,6 +32,7 @@ return [
     ],
 
     'webex' => [
+        'api_url' => env('WEBEX_API_URL', 'https://webexapis.com/v1'),
         'client_id' => env('WEBEX_CLIENT_ID'),
         'client_secret' => env('WEBEX_CLIENT_SECRET'),
         'redirect' => env('WEBEX_REDIRECT_URI', '/auth/webex/callback'),
@@ -111,18 +112,23 @@ return [
             'xapi_access' => [
                 'status' => [
                     [
-                        'path' => 'Call[*].AnswerState',
+                        'path' => 'SystemUnit.State.NumberOfActiveCalls',
                         'access' => 'required',
-                        'name' => 'Indicates if a call is answered, ignored or has been automatically answered by a '.
-                            'device.',
-                        'description' => 'Monitor outgoing Zoom CRC call from a device',
+                        'name' => 'Shows the number of active calls.',
+                        'description' => 'Receive notification when device is in an active call',
+                    ],
+                    [
+                        'path' => 'Call[*].*',
+                        'access' => 'required',
+                        'name' => 'Shows information related to an ongoing call.',
+                        'description' => 'Check if the active call is an outgoing Zoom CRC call',
                     ],
                 ],
                 'events' => [
                     [
                         'path' => 'UserInterface.Message.TextInput.Response',
                         'access' => 'required',
-                        'name' => '',
+                        'name' => 'Triggered when user responds to an input dialog box.',
                         'description' => 'Identify input for Zoom host account',
                     ],
                 ],
@@ -131,14 +137,20 @@ return [
                         'path' => 'UserInterface.Message.TextInput.Display',
                         'access' => 'required',
                         'name' => 'Displays an input dialog box to which a user can respond.',
-                        'description' => 'Display Zoom host account input field',
+                        'description' => 'Display Zoom host account input field prompt',
                     ],
                     [
                         'path' => 'UserInterface.Message.TextInput.Clear',
                         'access' => 'required',
                         'name' => 'Remove the text input message which was displayed using the UserInterface Message '.
                             'TextInput Display command.',
-                        'description' => 'Clear Zoom host account input field',
+                        'description' => 'Clear Zoom host account input field prompt',
+                    ],
+                    [
+                        'path' => 'Call.DTMFSend',
+                        'access' => 'required',
+                        'name' => 'Send DTMF tones to the far end.',
+                        'description' => 'Send the host-key when on a Zoom CRC call',
                     ],
                 ],
             ],
@@ -154,6 +166,7 @@ return [
     ],
 
     'zoom' => [
+        'api_url' => env('ZOOM_API_URL', 'https://api.zoom.us/v2'),
         'oauth_url' => env('ZOOM_OAUTH_URL', 'https://zoom.us/oauth/token'),
         'server_to_server' => [
             'scopes' => [
