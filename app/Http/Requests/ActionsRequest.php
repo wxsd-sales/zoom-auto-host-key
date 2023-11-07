@@ -33,11 +33,10 @@ class ActionsRequest extends ActivationRequest
         return [self::JWT => ['required', 'string']];
     }
 
+    /** {@inheritdoc} */
     public function after(): array
     {
         $data = self::addJwtPayloadData($this->all());
-
-        \Log::debug(json_encode($data));
 
         $setJwtPayload = function ($data) {
             $this->jwtPayload = $data[self::JWT_PAYLOAD] ?? null;

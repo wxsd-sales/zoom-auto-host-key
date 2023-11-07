@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignUuid('user_id')
-                ->after('id')->nullable()->index()
+            $table->foreignUuid('user_id')->index()->nullable()
                 ->constrained()->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->string('ip_address', 45)->nullable();

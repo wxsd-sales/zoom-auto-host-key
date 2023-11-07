@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('zm_s2s_client_id')->unique();
             $table->string('zm_s2s_client_secret');
             $table->json('zm_host_accounts')->nullable();
+            $table->string('operation_mode');
             $table->string('hmac_secret');
 
             $table->foreignUuid('wbx_wi_oauth_id')->nullable();

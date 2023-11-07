@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('wbx_wi_actions', function (Blueprint $table) {
             $table->uuid('id');
-            $table->foreignUuid('activation_id')
-                ->after('id')->index()
+            $table->foreignUuid('activation_id')->index()
                 ->constrained()->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->string('sub');

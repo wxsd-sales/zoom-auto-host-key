@@ -35,15 +35,15 @@ function filterHostAccountFields() {
 <template>
   <div class="columns is-multiline is-vcentered">
     <div class="column is-full">
-      <h2 class="subtitle">Step #5 <span class="has-text-info">(optional)</span></h2>
+      <h2 class="subtitle">Step #6 <span class="has-text-info">(optional)</span></h2>
       <h2 class="title">Add Meeting Host Accounts</h2>
     </div>
     <div class="column is-full content mb-0">
       <p>
-        When someone dials a Zoom SIP address (i.e. *@zoomcrc.com) on a configured RoomOS device, this application
-        displays an on device UI Message Prompt. The user can then choose to host the meeting as a machine/room account
-        or their own user account. If you do not provide any machine/room accounts below, the app will default to using
-        the user's account. However, in this case, the user account's host key will be reset.
+        You may provide one or more machine accounts that can act as host of a meeting. This is specially handy if you
+        want to be transparent that someone else besides the original meeting host is hosting. If you do not provide any
+        accounts below, the app will default to using the host's identity. However, in this case, the meeting host's key
+        will be changed.
       </p>
       <p>
         Depending on the deployment size, you may provide multiple machine/room accounts to circumvent Zoom's limits on

@@ -6,7 +6,8 @@ import DeployManifest from '@/Components/Activations/Create/Step1DeployManifest.
 import ProvideOauthCredentials from '@/Components/Activations/Create/Step2ProvideOauthCredentials.vue';
 import ProvideActivationCode from '@/Components/Activations/Create/Step3ProvideActionsJwt.vue';
 import CreateServerToServerApp from '@/Components/Activations/Create/Step4CreateServerToServerOauthApp.vue';
-import AddMeetingHostAccounts from '@/Components/Activations/Create/Step5AddMeetingHostAccounts.vue';
+import ChooseOperationMode from '@/Components/Activations/Create/Step5ChooseOperationMode.vue';
+import AddMeetingHostAccounts from '@/Components/Activations/Create/Step6AddMeetingHostAccounts.vue';
 
 interface Props {
   actionUrl?: string;
@@ -30,6 +31,7 @@ interface Props {
   wbxWiClientId: null;
   zmS2sAccountId: null;
   zmS2sClientId: null;
+  operationMode: 'automatic';
   zmHostAccounts: null;
 }
 
@@ -42,6 +44,7 @@ const form = useForm({
   zmS2sAccountId: props.zmS2sAccountId,
   zmS2sClientId: props.zmS2sClientId,
   zmS2sClientSecret: null,
+  operationMode: props.operationMode,
   zmHostAccounts: props.zmHostAccounts
 });
 </script>
@@ -50,7 +53,6 @@ const form = useForm({
   <Head>
     <title>Create Activation</title>
   </Head>
-  <!--  {{ route('activations.update') }}-->
   <form
     id="demo-activate"
     class="container px-4 mb-6"
@@ -83,6 +85,8 @@ const form = useForm({
       :errors="errors"
       :processing="form.processing"
     />
+    <hr />
+    <ChooseOperationMode v-model:operation-mode="form.operationMode" :errors="errors" :processing="form.processing" />
     <hr />
     <AddMeetingHostAccounts
       v-model:host-accounts="form.zmHostAccounts"

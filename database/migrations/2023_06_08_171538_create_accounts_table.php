@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('user_id')
-                ->after('id')->index()
+            $table->foreignUuid('user_id')->index()
                 ->constrained()->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->enum('type', ['oidc', 'oauth', 'email', 'credentials']);

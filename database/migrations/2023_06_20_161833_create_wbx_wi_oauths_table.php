@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('wbx_wi_oauths', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('activation_id')
-                ->after('id')->index()
+            $table->foreignUuid('activation_id')->index()
                 ->constrained()->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->text('account_id');

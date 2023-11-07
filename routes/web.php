@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Spatie\Health\Http\Controllers\HealthCheckResultsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+Route::get('health', HealthCheckResultsController::class);
 
 Route::middleware([
     'auth:sanctum',

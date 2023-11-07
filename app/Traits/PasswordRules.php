@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Actions\Fortify;
+namespace App\Traits;
 
 use Illuminate\Contracts\Validation\Rule;
 use Laravel\Fortify\Rules\Password;
 
-trait PasswordValidationRules
+/**
+ * Get the validation rules used to validate passwords.
+ */
+trait PasswordRules
 {
     /**
      * Get the validation rules used to validate passwords.

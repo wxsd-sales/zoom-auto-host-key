@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\JsonSerialize;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -50,6 +51,7 @@ class Account extends Model
 {
     use HasFactory;
     use HasUuids;
+    use JsonSerialize;
 
     /**
      * The attributes that are mass assignable.

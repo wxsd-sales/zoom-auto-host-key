@@ -4,11 +4,7 @@ namespace App\Constants;
 
 final class ActivationConstant
 {
-    public const WBX_WI_CLIENT_ID = 'wbxWiClientId';
-
-    public const WBX_WI_CLIENT_SECRET = 'wbxWiClientSecret';
-
-    public const WBX_WI_CONFIG = 'wbxWiConfig';
+    public const HMAC_SECRET = 'hmacSecret';
 
     public const WBX_WI_ACTION_JWT = 'wbxWiActionJwt';
 
@@ -16,27 +12,35 @@ final class ActivationConstant
 
     public const WBX_WI_ACTION_JWT_PAYLOAD = 'wbxWiActionJwtPayload';
 
-    public const WBX_WI_MANIFEST = 'wbxWiManifest';
-
-    public const WBX_WI_MANIFEST_ID = 'wbxWiManifestId';
-
-    public const WBX_WI_MANIFEST_VERSION = 'wbxWiManifestVersion';
-
-    public const WBX_WI_MANIFEST_URL = 'wbxWiManifestUrl';
-
     public const WBX_WI_APP_URL = 'wbxWiAppUrl';
 
-    public const WBX_WI_ORG_ID = 'wbxWiOrgId';
+    public const WBX_WI_CLIENT_ID = 'wbxWiClientId';
+
+    public const WBX_WI_CLIENT_SECRET = 'wbxWiClientSecret';
+
+    public const WBX_WI_CONFIG = 'wbxWiConfig';
 
     public const WBX_WI_DISPLAY_NAME = 'wbxWiDisplayName';
 
+    public const WBX_WI_MANIFEST = 'wbxWiManifest';
+
     public const WBX_WI_MANIFEST_ERRORED = 'wbxWiManifestErrored';
+
+    public const WBX_WI_MANIFEST_ID = 'wbxWiManifestId';
+
+    public const WBX_WI_MANIFEST_URL = 'wbxWiManifestUrl';
+
+    public const WBX_WI_MANIFEST_VERSION = 'wbxWiManifestVersion';
 
     public const WBX_WI_OAUTH = 'wbxWiOauth';
 
     public const WBX_WI_OAUTH_ERRORED = 'wbxWiOauthErrored';
 
+    public const WBX_WI_ORG_ID = 'wbxWiOrgId';
+
     public const WBX_WI_REFRESH_TOKEN = 'wbxWiRefreshToken';
+
+    public const OPERATION_MODE = 'operationMode';
 
     public const ZM_HOST_ACCOUNTS = 'zmHostAccounts';
 
@@ -51,8 +55,6 @@ final class ActivationConstant
     public const ZM_S2S_OAUTH = 'zmS2sOauth';
 
     public const ZM_S2S_OAUTH_ERRORED = 'zmS2sOauthErrored';
-
-    public const HMAC_SECRET = 'hmacSecret';
 
     public const SECRETS = [
         self::HMAC_SECRET,

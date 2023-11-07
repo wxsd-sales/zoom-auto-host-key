@@ -3,7 +3,10 @@
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use Monolog\Processor\HostnameProcessor;
 use Monolog\Processor\PsrLogMessageProcessor;
+use Monolog\Processor\UidProcessor;
+use Monolog\Processor\WebProcessor;
 
 return [
 
@@ -125,6 +128,19 @@ return [
 
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
+        ],
+
+        'json' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'path' => storage_path('logs/laravel.log'),
+            'formatter' => \App\Logging\JsonFormatter::class,
+            'processors' => [
+                PsrLogMessageProcessor::class,
+                HostnameProcessor::class,
+                UidProcessor::class,
+                WebProcessor::class,
+            ],
         ],
     ],
 

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Constants\OauthConstant;
+use App\Library\Constants\OauthConstant;
 
 class OauthService
 {

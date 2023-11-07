@@ -176,7 +176,7 @@ return [
                     'description' => 'Retrieve the host for an on device Zoom Meeting',
                 ],
                 [
-                    'id' => 'meeting:read:admin',
+                    'id' => 'meeting:write:admin',
                     'name' => 'View and manage all user meetings',
                     'description' => 'Add machine/room account as host for an on device Zoom Meeting',
                 ],

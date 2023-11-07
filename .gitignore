@@ -993,3 +993,25 @@ _ide_helper*.php
 
 .env.*
 !.env.*.example
+
+.idea/codeStyles
+.idea/runConfigurations
+
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+*.s3db
+*.sl3
+
+appdata/
+mnt/
+mount/
+volumes/
+docker/mnt/
+docker/mount/
+docker/volumes/
+docker/storage/
+docker/appdata/
+
+

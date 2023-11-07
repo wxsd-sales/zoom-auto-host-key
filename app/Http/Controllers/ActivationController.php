@@ -49,9 +49,13 @@ class ActivationController extends Controller
             compact('id'), config('services.webex.workspace_integration'))
         )->camelCaseKeys(0);
         ${ActivationConstant::ZM_S2S_CONFIG} = collect(config('services.zoom.server_to_server'))->camelCaseKeys(0);
+        ${ActivationConstant::OPERATION_MODE} = 'automatic';
 
         return inertia('Activations/Create', compact(
-            'actionUrl', ActivationConstant::WBX_WI_CONFIG, ActivationConstant::ZM_S2S_CONFIG
+            'actionUrl',
+            ActivationConstant::WBX_WI_CONFIG,
+            ActivationConstant::ZM_S2S_CONFIG,
+            ActivationConstant::OPERATION_MODE
         ));
     }
 
@@ -103,7 +107,10 @@ class ActivationController extends Controller
             $activation->wbx_wi_oauth_id = $wbxWiOauth->id;
             $activation->zm_s2s_oauth_id = $zmS2sOauth->id;
             $activation->save();
-            WebexService::activateWorkspaceIntegration($activation)->throw();
+
+            $actionsUrl = config('app.url').route('activations.actions', $activation, false);
+            $webhookUrl = config('app.url').route('activations.webhook', $activation, false);
+            WebexService::activateWorkspaceIntegration($activation, $actionsUrl, $webhookUrl)->throw();
         });
 
         return redirect()->action([ActivationController::class, 'index']);

@@ -52,19 +52,13 @@ $black: #000000;
 $blue: #00bcf5;
 $green: #82cf5f;
 $yellow: #fbbd23;
-$white: #fafafa;
-%boxshadow {
-  box-shadow: 0.25rem 0.25rem 0.6rem rgba(0, 0, 0, 0.05), 0 0.5rem 1.125rem rgba(75, 0, 0, 0.05);
-}
 ol.gradient-list {
   counter-reset: gradient-counter;
   list-style: none;
   margin: 1.75rem 0;
   padding-left: 1rem;
   > li {
-    background: white;
     border-radius: 0.1rem 0.5rem 0.5rem 0.5rem;
-    //@extend %boxshadow;
     counter-increment: gradient-counter;
     margin-top: 1rem;
     min-height: 3rem;
@@ -84,7 +78,6 @@ ol.gradient-list {
     }
     &::before {
       align-items: flex-end;
-      //@extend %boxshadow;
       content: counter(gradient-counter);
       color: $black;
       display: flex;

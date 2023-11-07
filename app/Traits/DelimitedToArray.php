@@ -3,12 +3,12 @@
 namespace App\Traits;
 
 /**
- * Split a string by a separator into trimmed individual values.
+ * Split a delimited string into individually trimmed values.
  */
 trait DelimitedToArray
 {
     /**
-     * Split a string by a separator into trimmed individual values.
+     * Split a delimited string into individually trimmed values.
      */
     protected static function delimitedToArray(string $value, string $delimiter = ','): array
     {

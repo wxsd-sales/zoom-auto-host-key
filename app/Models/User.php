@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\JsonSerialize;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -58,6 +59,7 @@ class User extends Authenticatable
     use HasFactory;
     use HasProfilePhoto;
     use HasUuids;
+    use JsonSerialize;
     use Notifiable;
     use TwoFactorAuthenticatable;
 

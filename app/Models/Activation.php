@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\CamelCaseJsonSerialize;
+use App\Traits\JsonSerialize;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $zm_s2s_client_id
  * @property mixed $zm_s2s_client_secret
  * @property array|null $zm_host_accounts
+ * @property string $operation_mode
  * @property string $hmac_secret
  * @property string|null $wbx_wi_oauth_id
  * @property string|null $zm_s2s_oauth_id
@@ -45,6 +46,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereHmacSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Activation whereOperationMode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiAppUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Activation whereWbxWiClientId($value)
@@ -69,8 +71,8 @@ class Activation extends Model
 {
     use HasFactory;
     use HasUuids;
+    use JsonSerialize;
     use SoftDeletes;
-    use CamelCaseJsonSerialize;
 
     /**
      * The attributes that are mass assignable.
@@ -93,6 +95,7 @@ class Activation extends Model
         'zm_host_accounts',
         'wbx_wi_oauth_id',
         'zm_s2s_oauth_id',
+        'operation_mode',
         'hmac_secret',
     ];
 

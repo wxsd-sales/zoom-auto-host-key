@@ -4,26 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Constants\ActionsConstant;
 use App\Http\Requests\ActionsRequest;
+use App\Library\Constants\OauthConstant;
+use App\Library\Enums\Webex\WorkspaceIntegration\JwtPayloadActionEnum;
 use App\Models\Activation;
 use App\Models\WbxWiAction;
+use App\Services\OauthService;
+use App\Services\WebexService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 
 class ActionsController extends Controller
 {
-    /**
-     * Handle update approved user action for Workspace Integration.
-     */
-    protected function handleUpdateApproved(Activation $activation, WbxWiAction $wbxWiAction): Response
-    {
-        $activation->wbx_wi_manifest_version = intval($wbxWiAction->jwt_payload['manifestVersion']);
-        $activation->wbxWiActions()->save($wbxWiAction);
-        $activation->save();
-
-        return response()->noContent();
-    }
-
     /**
      * Handle deprovision user action for Workspace Integration.
      */
@@ -53,6 +45,41 @@ class ActionsController extends Controller
         return response()->json(compact('operationalState', 'tokensState'));
     }
 
+    /**
+     * Handle update user action for Workspace Integration.
+     */
+    protected function handleUpdate(Activation $activation, WbxWiAction $wbxWiAction): Response
+    {
+        $activation->wbxWiActions()->save($wbxWiAction);
+        $activation->wbx_wi_org_id = basename(base64_decode($wbxWiAction->jwt_payload['sub']));
+        if ($wbxWiAction->jwt_payload['appUrl'] ?? null) {
+            $activation->wbx_wi_app_url = $wbxWiAction->jwt_payload['appUrl'];
+        }
+        if ($wbxWiAction->jwt_payload['manifestUrl'] ?? null) {
+            $activation->wbx_wi_manifest_url = $wbxWiAction->jwt_payload['manifestUrl'];
+        }
+        $activation->wbxWiOauth->update(OauthService::addExpiresAt(WebexService::getWorkspaceIntegrationOauth([
+            OauthConstant::REFRESH_TOKEN => $wbxWiAction->jwt_payload['refreshToken'],
+            OauthConstant::CLIENT_ID => $activation->wbx_wi_client_id,
+            OauthConstant::CLIENT_SECRET => $activation->wbx_wi_client_secret,
+        ])->json()));
+        $activation->save();
+
+        return response()->noContent();
+    }
+
+    /**
+     * Handle update approved user action for Workspace Integration.
+     */
+    protected function handleUpdateApproved(Activation $activation, WbxWiAction $wbxWiAction): Response
+    {
+        $activation->wbx_wi_manifest_version = intval($wbxWiAction->jwt_payload['manifestVersion']);
+        $activation->wbxWiActions()->save($wbxWiAction);
+        $activation->save();
+
+        return response()->noContent();
+    }
+
     public function store(ActionsRequest $request, Activation $activation)
     {
         $wbxWiAction = WbxWiAction::make(collect([
@@ -61,10 +88,11 @@ class ActionsController extends Controller
             ...$request->jwtPayload,
         ])->snakeCaseKeys(0)->toArray());
 
-        return match ($request->jwtPayload['action']) {
-            ActionsConstant::DEPROVISION => $this->handleDeprovision($activation, $wbxWiAction),
-            ActionsConstant::HEALTH_CHECK => $this->handleHealthCheck($activation, $wbxWiAction),
-            ActionsConstant::UPDATE_APPROVED => $this->handleUpdateApproved($activation, $wbxWiAction),
+        return match (JwtPayloadActionEnum::tryFrom($request->jwtPayload['action'])) {
+            JwtPayloadActionEnum::DEPROVISION => $this->handleDeprovision($activation, $wbxWiAction),
+            JwtPayloadActionEnum::HEALTH_CHECK => $this->handleHealthCheck($activation, $wbxWiAction),
+            JwtPayloadActionEnum::UPDATE => $this->handleUpdate($activation, $wbxWiAction),
+            JwtPayloadActionEnum::UPDATE_APPROVED => $this->handleUpdateApproved($activation, $wbxWiAction),
             default => response()->noContent(400),
         };
     }

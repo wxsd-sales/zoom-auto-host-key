@@ -8,6 +8,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Spatie\Health\Checks\Checks\CacheCheck;
+use Spatie\Health\Checks\Checks\DatabaseCheck;
+use Spatie\Health\Checks\Checks\DebugModeCheck;
+use Spatie\Health\Checks\Checks\EnvironmentCheck;
+use Spatie\Health\Checks\Checks\OptimizedAppCheck;
+use Spatie\Health\Checks\Checks\UsedDiskSpaceCheck;
+use Spatie\Health\Facades\Health;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -112,5 +119,16 @@ class AppServiceProvider extends ServiceProvider
         ): Has => new Has($required, $valueSeparator, $valueComparer));
 
         Rule::macro('hydraId', fn (string $match, bool $strict = false): HydraId => new HydraId($match, $strict));
+
+        Health::checks([
+            EnvironmentCheck::new(),
+            DebugModeCheck::new(),
+            OptimizedAppCheck::new(),
+            CacheCheck::new(),
+            DatabaseCheck::new(),
+            UsedDiskSpaceCheck::new()
+                ->warnWhenUsedSpaceIsAbovePercentage(70)
+                ->failWhenUsedSpaceIsAbovePercentage(90),
+        ]);
     }
 }
