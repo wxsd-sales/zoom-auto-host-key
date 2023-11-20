@@ -16,7 +16,7 @@ class SignalMeetingHostKey implements \App\Contracts\SignalsMeetingHostKey
         string $token, string $deviceId, string $callId, string $dtmfString, Pool $pool = null
     ): PromiseInterface|Response {
         $webexApiUrl = config('services.webex.api_url');
-        $arguments = ['CallId' => $callId, 'DTMFString' => $dtmfString, 'Feedback' => 'Silent'];
+        $arguments = ['CallId' => (int) $callId, 'DTMFString' => $dtmfString, 'Feedback' => 'Silent'];
         $xapiUrl = $webexApiUrl.'/xapi/command/Call.DTMFSend';
         $body = compact('deviceId', 'arguments');
 

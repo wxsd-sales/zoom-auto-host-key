@@ -39,23 +39,21 @@ class ActivationController extends Controller
      */
     public function create(Request $request)
     {
-        $id = $request->old('id') ?? Str::orderedUuid()->toString();
-        $signature = $request->old('signature');
-        $actionUrl = $request->old('id') !== null
-            ? URL::route('activations.store', compact('id', 'signature'))
-            : URL::signedRoute('activations.store', compact('id'));
-
-        ${ActivationConstant::WBX_WI_CONFIG} = collect(array_merge(
-            compact('id'), config('services.webex.workspace_integration'))
-        )->camelCaseKeys(0);
-        ${ActivationConstant::ZM_S2S_CONFIG} = collect(config('services.zoom.server_to_server'))->camelCaseKeys(0);
+        $id = $request->old('id', Str::orderedUuid()->toString());
+        $actionUrl = URL::signedRoute('activations.store', compact('id'));
+        ${ActivationConstant::WBX_WI_CONFIG} = collect(
+            array_merge(compact('id'), config('services.webex.workspace_integration'))
+        )
+            ->camelCaseKeys(0);
+        ${ActivationConstant::ZM_S2S_CONFIG} = collect(config('services.zoom.server_to_server'))
+            ->camelCaseKeys(0);
         ${ActivationConstant::OPERATION_MODE} = 'automatic';
 
         return inertia('Activations/Create', compact(
             'actionUrl',
+            ActivationConstant::OPERATION_MODE,
             ActivationConstant::WBX_WI_CONFIG,
             ActivationConstant::ZM_S2S_CONFIG,
-            ActivationConstant::OPERATION_MODE
         ));
     }
 
@@ -88,7 +86,7 @@ class ActivationController extends Controller
         ]);
         $zmS2sOauthAttributes = collect([
             'activationId' => $activationAttributes['id'],
-            'accountId' => $request[ActivationConstant::ZM_S2S_ACCOUNT_ID],
+            'accountId' => $request->validated(ActivationConstant::ZM_S2S_ACCOUNT_ID),
             ...$request->zmS2sOauth,
         ]);
 

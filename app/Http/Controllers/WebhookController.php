@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AddUserAssistant;
 use App\Actions\DisplayInputPromptForActiveCall;
 use App\Actions\GetActiveCallStatus;
 use App\Actions\SendHostOtp;
@@ -125,7 +126,9 @@ class WebhookController extends Controller
                 $hostKey = $machineAccount['key'];
                 $dtmfString = $this->createDtmfString($destructuredCallbackNumber, $hostKey);
                 if ($currentHost !== $machineAccount['email']) {
-                    UpdateMeetingHost::handle($zmS2sToken, $meetingId, $toEmail, $currentHost)->throw();
+                    AddUserAssistant::handle($zmS2sToken, $toEmail, $currentHost);
+                    AddUserAssistant::handle($zmS2sToken, $currentHost, $toEmail);
+                    UpdateMeetingHost::handle($zmS2sToken, $meetingId, $toEmail, [$currentHost])->throw();
                 }
                 SignalMeetingHostKey::handle($wbxWiToken, $deviceId, $activeCallStatus['id'], $dtmfString)->throw();
 
@@ -184,7 +187,9 @@ class WebhookController extends Controller
             $hostKey = $machineAccount['key'];
             $dtmfString = $this->createDtmfString($destructuredCallbackNumber, $hostKey);
             if ($currentHost !== $machineAccount['email']) {
-                UpdateMeetingHost::handle($zmS2sToken, $meetingId, $toEmail, $currentHost)->throw();
+                AddUserAssistant::handle($zmS2sToken, $toEmail, $currentHost);
+                AddUserAssistant::handle($zmS2sToken, $currentHost, $toEmail);
+                UpdateMeetingHost::handle($zmS2sToken, $meetingId, $toEmail, [$currentHost])->throw();
             }
             SignalMeetingHostKey::handle($wbxWiToken, $deviceId, $callId, $dtmfString)->throw();
 

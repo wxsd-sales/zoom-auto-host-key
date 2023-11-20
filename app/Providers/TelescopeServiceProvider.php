@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Constants\ActivationConstant;
-use App\Constants\OauthConstant;
+use App\Library\Constants\OauthConstant;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;

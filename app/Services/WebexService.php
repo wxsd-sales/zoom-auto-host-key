@@ -57,7 +57,7 @@ class WebexService
     public static function getWorkspaceIntegrationJwtPayloadValidator(array $data, Request $request = null): Validator
     {
         $appId = $request?->query('id');
-        $accountId = $request?->session()->get('account.webex') != null
+        $accountId = $request->hasSession()
             ? Account::whereId($request->session()->get('account.webex'))->first()->provider_account_id
             : null;
         $manifestVersion = $request?->activation?->wbx_wi_manifest_version !== null
