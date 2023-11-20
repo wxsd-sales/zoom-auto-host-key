@@ -22,7 +22,6 @@
           application host.
         </li>
         <li>Moved the devices into Workspaces, that is, the devices should be in <b>shared mode</b>.</li>
-        <li>Enough <b>Zoom Business or Concurrent Meetings Basic/Plus licenses</b>, to cover your deployment size.</li>
         <li>
           Administrator access to the org's Webex
           <a href="https://www.webex.com/control-hub.html" target="_blank">Control Hub</a> dashboard with the devices as

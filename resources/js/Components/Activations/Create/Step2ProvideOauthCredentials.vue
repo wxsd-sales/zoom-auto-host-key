@@ -61,7 +61,7 @@ const clientSecretType = ref<'password' | 'text'>('password');
       <label class="label" for="webex-workspace-integration-oauth-client-secret">
         OAuth Client Secret <sup class="has-text-danger" title="required">*</sup>
       </label>
-      <div class="field has-addons">
+      <div class="field">
         <div class="control is-expanded has-icons-left has-icons-right">
           <input
             id="webex-workspace-integration-oauth-client-secret"
@@ -82,13 +82,6 @@ const clientSecretType = ref<'password' | 'text'>('password');
               @click="togglePasswordReveal()"
             />
           </span>
-        </div>
-        <div class="control">
-          <button class="button is-primary is-light">
-            <span class="icon">
-              <i class="mdi mdi-pencil"></i>
-            </span>
-          </button>
         </div>
       </div>
       <p v-if="errors?.wbxWiClientSecret" class="help is-danger">{{ errors?.wbxWiClientSecret }}</p>
