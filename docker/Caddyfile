@@ -4,12 +4,11 @@
   }
 }
 
-localhost, tunnel-ashessin.wxsd.us {
+http://localhost, http://zoom-auto-host-key.wbx.ninja {
   root * /var/www/html/public
   php_fastcgi unix//var/run/php-fpm.sock
   encode zstd gzip
   file_server
-  tls internal
   request_header X-Request-Id {http.request.uuid}
   header -Server
   header -X-Powered-By

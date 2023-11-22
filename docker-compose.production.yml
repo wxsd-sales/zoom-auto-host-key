@@ -2,83 +2,31 @@
 version: '3.4'
 
 services:
-  laravel:
+  app:
     container_name: laravel
     image: zoom-auto-host-key/laravel:latest
     build:
       dockerfile: docker/Dockerfile
       args:
         COMPOSER_VERSION: ${COMPOSER_VERSION:-2}
-        NODE_VERSION: ${NODE_VERSION:-18-alpine3.18}
-        PHP_VERSION: ${PHP_VERSION:-8.2-fpm-alpine3.18}
+        NODE_VERSION: ${NODE_VERSION:-18-bookworm}
+        PHP_VERSION: ${PHP_VERSION:-8.2-fpm-bookworm}
     ports:
-      - ${APP_PORT:-443}:443
-      - ${APP_PORT:-443}:443/udp
+      - ${APP_PORT:-80}:80
     environment:
       APP_SERVICE: ${APP_SERVICE:-laravel}
     volumes:
-      - caddy-config:/root/.config/caddy
-      - caddy-data:/root/.local/share/caddy
-      - logs:/var/log
+      - ${PWD}/.data/database:/var/www/html/database/sqlite
+      - ${PWD}/.data/caddy/config:/root/.config/caddy
+      - ${PWD}/.data/caddy/data:/root/.local/share/caddy
+      - ${PWD}/.data/logs:/var/log
     networks:
       - lan
     restart: unless-stopped
     entrypoint:
       - /usr/local/bin/entrypoint
-      - /run/secrets/env
-    secrets:
-      - env
-    depends_on:
-      mariadb:
-        condition: service_healthy
-  mariadb:
-    image: mariadb:10
-    container_name: mariadb
-    ports:
-      - ${DB_PORT:-3306}:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_HOST: '%'
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ALLOW_EMPTY_PASSWORD: no
-    volumes:
-      - mariadb-data:/var/lib/mysql
-    networks:
-      - lan
-    healthcheck:
-      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
-      retries: 3
-      timeout: 5s
-      interval: 15s
-      start_period: 10s
-    restart: unless-stopped
-
-volumes:
-  mariadb-data:
-    driver_opts:
-      o: bind
-      device: ${PWD}/volumes/mariadb-data
-  caddy-config:
-    driver_opts:
-      o: bind
-      device: ${PWD}/volumes/caddy-config
-  caddy-data:
-    driver_opts:
-      o: bind
-      device: ${PWD}/volumes/caddy-data
-  logs:
-    driver_opts:
-      o: bind
-      device: ${PWD}/volumes/logs
 
 networks:
   lan:
     driver: bridge
-    external: false
-
-secrets:
-  env:
-    file: ./.env.production
     external: false

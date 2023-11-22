@@ -991,7 +991,9 @@ public/storage/*
 **/.phpstorm.meta.php
 **/_ide_helper*.php
 
+**/.env
 **/.env.*
+!**/.env.example
 !**/.env.*.example
 
 **/.idea/codeStyles
@@ -1004,6 +1006,7 @@ public/storage/*
 **/*.s3db
 **/*.sl3
 
+**/.data
 **/appdata/
 **/mnt/
 **/mount/
@@ -1019,3 +1022,5 @@ public/storage/*
 **/Dockerfile.*
 docker-compose*.yml
 docker-compose*.yaml
+kubectl.yaml
+!.env.production
