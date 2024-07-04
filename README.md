@@ -12,8 +12,8 @@ The change disallow retrieving a host's key using their email address, essential
 solutions useless.
 
 <p align="center">
-   <a href="https://www.youtube.com/watch?v=" target="_blank">
-       <img src="" alt="zoom-auto-host-key-demo"/>
+   <a href="https://app.vidcast.io/share/3fe18984-4c85-4edb-9550-cea3d03050e3" target="_blank">
+       <img src="https://github.com/wxsd-sales/zoom-auto-host-key/assets/6129517/6734dbd0-3bb4-41fc-b77e-730f94ea8e57" alt="zoom-auto-host-key-demo"/>
     </a>
 </p>
 
@@ -129,7 +129,7 @@ terminal.
 
 ## Demo
 
-A video where I demo this PoC is available on YouTube — https://www.youtube.com/watch?v=.
+A video where I demo this PoC is available on Vidcast — [https://app.vidcast.io/share/3fe18984-4c85-4edb-9550-cea3d03050e3](https://app.vidcast.io/share/3fe18984-4c85-4edb-9550-cea3d03050e3).
 
 ## Disclaimer
 
