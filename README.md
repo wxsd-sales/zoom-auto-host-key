@@ -75,7 +75,7 @@ Open a new terminal window and follow the instructions below to setup the projec
      |-------------------------|-----------------------------------------------|
      | spark-admin:people_read | Access to read your user's company directory |
      | spark:people_read | Access to read your user's company directory |
-     | spark:kms | Permission to interact with encrypted content |
+     | spark:kms | Permission to interact with encrypted content (automatically added to your integration) |
    - Use these Redirect URIs:
      - `<APP_URL>/auth/webex/callback`
      - `http://localhost/auth/webex/callback`
